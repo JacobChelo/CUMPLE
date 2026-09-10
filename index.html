@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feliz cumpleaños, gomita</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#05050c;
+    --bg-mid:#0b0c1c;
+    --gold:#d4af37;
+    --gold-light:#f5e3ab;
+    --gold-dim:rgba(212,175,55,.38);
+    --cream:#f4efe1;
+    --rose:#e7a978;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg-deep);color:var(--cream);font-family:'Jost',sans-serif;overflow-x:hidden;scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001s !important; animation-iteration-count:1 !important; transition-duration:0.001s !important;}
+  }
+
+  canvas#bg-stars{position:fixed;inset:0;width:100%;height:100%;z-index:-2;background:radial-gradient(ellipse at 50% 0%, var(--bg-mid), var(--bg-deep) 70%);}
+
+  .aurora{position:fixed;inset:-15%;z-index:-3;pointer-events:none;
+    background:
+      radial-gradient(circle at 28% 22%, rgba(212,175,55,.14), transparent 45%),
+      radial-gradient(circle at 76% 68%, rgba(231,169,120,.11), transparent 50%),
+      radial-gradient(circle at 55% 90%, rgba(245,227,171,.08), transparent 55%);
+    filter:blur(50px);
+    animation:auroraMove 20s ease-in-out infinite alternate;
+  }
+  @keyframes auroraMove{
+    0%{transform:translate(0,0) scale(1);}
+    50%{transform:translate(-3%,2%) scale(1.06);}
+    100%{transform:translate(3%,-2%) scale(1.1);}
+  }
+
+  #hearts-bg{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;}
+  .floating-heart{position:absolute;bottom:-40px;color:var(--gold-dim);opacity:0;will-change:transform,opacity;animation:floatUp linear forwards;}
+  @keyframes floatUp{
+    0%{transform:translateY(0) translateX(0) rotate(0deg);opacity:0;}
+    8%{opacity:.55;}
+    88%{opacity:.35;}
+    100%{transform:translateY(-115vh) translateX(var(--drift,24px)) rotate(360deg);opacity:0;}
+  }
+
+  .heart-burst{position:fixed;z-index:70;pointer-events:none;color:var(--gold-light);will-change:transform,opacity;}
+
+  h1,h2,.serif{font-family:'Cormorant Garamond', serif;}
+
+  @keyframes titleGlow{
+    0%,100%{text-shadow:0 0 22px var(--gold-dim), 0 0 2px var(--gold-light);}
+    50%{text-shadow:0 0 42px rgba(212,175,55,.75), 0 0 6px var(--gold-light);}
+  }
+  @keyframes heartbeat{
+    0%{transform:scale(1);}
+    20%{transform:scale(1.08);}
+    35%{transform:scale(1);}
+    50%{transform:scale(1.08);}
+    70%{transform:scale(1);}
+    100%{transform:scale(1);}
+  }
+  @keyframes fadeSlideIn{
+    from{opacity:0;transform:translateY(18px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+
+  section{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6vh 6vw;position:relative;text-align:center;}
+
+  /* HERO */
+  .hero h1{font-size:clamp(2.4rem,6vw,4.6rem);font-weight:500;letter-spacing:.5px;margin:0 0 .6rem;
+    background:linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 25%, var(--cream) 50%, var(--gold-light) 75%, var(--gold) 100%);
+    background-size:220% auto;-webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:fadeSlideIn 1.2s ease both, titleGlow 4s ease-in-out infinite 1.2s, shimmerText 7s linear infinite;}
+  @keyframes shimmerText{0%{background-position:0% center;}100%{background-position:220% center;}}
+
+  .dust-mote{position:fixed;top:-10px;border-radius:50%;background:var(--gold-light);pointer-events:none;z-index:-1;animation:dustFall linear forwards;}
+  @keyframes dustFall{
+    0%{transform:translate(0,0);opacity:0;}
+    10%{opacity:.6;}
+    90%{opacity:.3;}
+    100%{transform:translate(var(--dx,0), 105vh);opacity:0;}
+  }
+
+  .progress-bar{width:min(80vw,300px);height:3px;background:rgba(212,175,55,.15);border-radius:999px;margin:0 auto 1.4rem;overflow:hidden;}
+  .progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:999px;transition:width .6s ease;box-shadow:0 0 10px var(--gold-dim);}
+
+  .star.opened{position:absolute;}
+  .star.opened::after{
+    content:'';position:absolute;inset:-14px;border-radius:50%;
+    background:conic-gradient(from 0deg, transparent, var(--gold-dim), transparent 60%);
+    animation:ringSpin 3.5s linear infinite;pointer-events:none;
+  }
+  @keyframes ringSpin{to{transform:rotate(360deg);}}
+  .hero .subtitle{font-size:clamp(1rem,2vw,1.25rem);color:var(--cream);opacity:0;max-width:32rem;margin:0 0 2.6rem;font-weight:300;line-height:1.6;
+    animation:fadeSlideIn 1.2s ease .5s both;}
+  .hero .subtitle strong{color:var(--gold-light);font-weight:500;}
+
+  button.primary{
+    background:transparent;border:1px solid var(--gold);color:var(--gold-light);
+    font-family:'Jost',sans-serif;font-size:.95rem;letter-spacing:1px;
+    padding:.9rem 2.4rem;border-radius:999px;cursor:pointer;position:relative;overflow:hidden;
+    transition:background .35s ease, color .35s ease, box-shadow .35s ease, transform .25s ease;
+    opacity:0;animation:fadeSlideIn 1.2s ease 1s both, breathe 3s ease-in-out infinite 2.2s;
+  }
+  .ripple{position:absolute;border-radius:50%;background:rgba(212,175,55,.5);transform:scale(0);animation:rippleAnim .6s ease-out forwards;pointer-events:none;}
+  @keyframes rippleAnim{to{transform:scale(3);opacity:0;}}
+
+  .cursor-spark{position:fixed;width:4px;height:4px;border-radius:50%;background:var(--gold-light);pointer-events:none;z-index:40;box-shadow:0 0 6px var(--gold);animation:sparkFade .7s ease-out forwards;}
+  @keyframes sparkFade{to{transform:scale(.2) translateY(-6px);opacity:0;}}
+  button.primary:hover{background:var(--gold);color:var(--bg-deep);box-shadow:0 0 32px var(--gold-dim);transform:translateY(-2px);}
+  button.primary:active{transform:translateY(0) scale(.97);}
+  button.primary:focus-visible{outline:2px solid var(--gold-light);outline-offset:3px;}
+  @keyframes breathe{
+    0%,100%{box-shadow:0 0 0 rgba(212,175,55,0);}
+    50%{box-shadow:0 0 22px var(--gold-dim);}
+  }
+
+  .hero .hint{margin-top:3.2rem;font-size:.8rem;opacity:0;letter-spacing:.5px;animation:fadeSlideIn 1.2s ease 1.6s both;}
+
+  .music-player{margin-top:1.8rem;width:min(90vw,340px);opacity:0;animation:fadeSlideIn 1.2s ease 2s both;}
+  .music-caption{font-size:.75rem;letter-spacing:.5px;color:var(--gold-light);opacity:.7;margin:0 0 .5rem;font-weight:300;}
+
+  .note{
+    margin-top:2rem;max-width:26rem;font-family:'Cormorant Garamond',serif;font-style:italic;
+    font-size:1.05rem;line-height:1.7;color:var(--cream);opacity:0;
+    animation:fadeSlideIn 1.2s ease 2.5s both;
+  }
+
+  /* CONSTELLATION */
+  .progress{font-size:.9rem;letter-spacing:1px;color:var(--gold-light);opacity:.85;margin-bottom:1.2rem;font-weight:400;}
+  .sky-frame{position:relative;width:min(90vw,640px);aspect-ratio:4/3.4;transition:transform .15s ease-out;}
+  svg.lines{position:absolute;inset:0;width:100%;height:100%;overflow:visible;}
+  svg.lines line{stroke:var(--gold);stroke-width:.5;fill:none;opacity:0;stroke-dasharray:100;stroke-dashoffset:100;transition:stroke-dashoffset 1.1s ease, opacity .4s ease;}
+  svg.lines line.active{opacity:.55;stroke-dashoffset:0;}
+
+  .star{
+    position:absolute;transform:translate(-50%,-50%);
+    background:none;border:none;cursor:pointer;padding:14px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .star svg{width:26px;height:26px;transition:transform .3s ease;}
+  .star .spark{fill:var(--gold-dim);transition:fill .5s ease, filter .5s ease;filter:drop-shadow(0 0 4px rgba(212,175,55,.3));animation:twinkle 2.6s ease-in-out infinite;}
+  .star:nth-of-type(2) .spark{animation-delay:.3s;}
+  .star:nth-of-type(3) .spark{animation-delay:.7s;}
+  .star:nth-of-type(4) .spark{animation-delay:1.1s;}
+  .star:nth-of-type(5) .spark{animation-delay:.5s;}
+  .star:nth-of-type(6) .spark{animation-delay:.9s;}
+  .star:nth-of-type(7) .spark{animation-delay:1.4s;}
+  .star:nth-of-type(8) .spark{animation-delay:.2s;}
+  .star:nth-of-type(9) .spark{animation-delay:.6s;}
+  .star:nth-of-type(10) .spark{animation-delay:1.2s;}
+  .star:nth-of-type(11) .spark{animation-delay:.4s;}
+  .star:nth-of-type(12) .spark{animation-delay:1.6s;}
+  .star:hover svg{transform:scale(1.3) rotate(8deg);}
+  .star.opened svg{animation:popIn .5s ease;}
+  .star.opened .spark{fill:var(--gold-light);filter:drop-shadow(0 0 10px var(--gold));animation:none;}
+  @keyframes twinkle{0%,100%{opacity:.5;}50%{opacity:1;}}
+  @keyframes popIn{0%{transform:scale(1);}40%{transform:scale(1.6) rotate(15deg);}100%{transform:scale(1);}}
+
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity 1s ease, transform 1s ease;}
+  .reveal.in-view{opacity:1;transform:translateY(0);}
+  .constellation .below{margin-top:2.4rem;min-height:1.6rem;}
+
+  /* MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(5,5,12,.82);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:50;opacity:0;pointer-events:none;transition:opacity .35s ease;perspective:900px;}
+  .modal-overlay.show{opacity:1;pointer-events:auto;}
+  .modal-card{
+    max-width:min(88vw,420px);padding:2.6rem 2.2rem;text-align:center;
+    background:linear-gradient(180deg, rgba(20,18,10,.9), rgba(10,10,18,.92));
+    border:1px solid var(--gold-dim);border-radius:6px;
+    transform:scale(.92);transition:transform .35s ease;
+    box-shadow:0 0 60px rgba(212,175,55,.12);
+    transform-style:preserve-3d;
+  }
+  .modal-card .mini-heart{font-size:1.1rem;color:var(--gold);opacity:.85;display:block;margin-bottom:1rem;animation:heartbeat 1.8s ease-in-out infinite;}
+  .modal-overlay.show .modal-card{transform:scale(1);}
+  .modal-card p{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.45rem;line-height:1.55;color:var(--cream);margin:0 0 1.8rem;}
+  .modal-card button{background:none;border:1px solid var(--gold-dim);color:var(--gold-light);font-family:'Jost',sans-serif;font-size:.8rem;letter-spacing:1px;padding:.55rem 1.6rem;border-radius:999px;cursor:pointer;transition:border-color .3s ease,color .3s ease;}
+  .modal-card button:hover{border-color:var(--gold);color:var(--gold-light);}
+
+  /* FINALE */
+  .finale{display:none;}
+  .finale.show{display:flex;}
+  .finale h2{font-size:clamp(2rem,5vw,3.2rem);color:var(--gold-light);font-weight:500;margin:1.8rem 0 .6rem;}
+  .finale h2.beat{animation:heartbeat 1.6s ease-in-out 2;}
+  .finale .msg{max-width:34rem;font-size:1.1rem;line-height:1.8;opacity:0;transform:translateY(10px);transition:opacity .8s ease, transform .8s ease;font-weight:300;}
+  .finale .msg.show{opacity:1;transform:translateY(0);}
+  .finale .signature{margin-top:1.4rem;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.3rem;color:var(--gold);}
+  .finale .ps{margin-top:1rem;font-size:.85rem;color:var(--gold-light);opacity:0;font-weight:300;letter-spacing:.3px;transition:opacity 1s ease;}
+  .replay-btn{margin-top:2.4rem;background:none;border:none;color:var(--gold-dim);font-family:'Jost',sans-serif;font-size:.8rem;letter-spacing:1px;cursor:pointer;text-decoration:underline;text-underline-offset:4px;opacity:0;transition:opacity 1s ease, color .3s ease;}
+  .replay-btn:hover{color:var(--gold-light);}
+
+  .cake{position:relative;width:180px;margin-bottom:1.6rem;cursor:pointer;}
+  .cake-glow{position:absolute;top:50%;left:50%;width:260px;height:260px;transform:translate(-50%,-50%);
+    background:radial-gradient(circle, rgba(212,175,55,.22), transparent 65%);
+    border-radius:50%;animation:glowPulse 3.5s ease-in-out infinite;pointer-events:none;z-index:-1;}
+  @keyframes glowPulse{0%,100%{opacity:.5;transform:translate(-50%,-50%) scale(1);}50%{opacity:.9;transform:translate(-50%,-50%) scale(1.12);}}
+
+  .orbit{position:absolute;top:50%;left:50%;width:230px;height:230px;margin-top:-115px;margin-left:-115px;
+    animation:ringSpin 14s linear infinite;pointer-events:none;}
+  .orbit span{position:absolute;top:0;left:50%;color:var(--gold-dim);font-size:11px;transform:translateX(-50%);}
+  .orbit span:nth-child(2){top:50%;left:100%;transform:translate(-50%,-50%);}
+  .orbit span:nth-child(3){top:100%;left:50%;transform:translateX(-50%);}
+  .orbit span:nth-child(4){top:50%;left:0;transform:translate(-50%,-50%);}
+  .plate{width:200px;height:14px;margin-left:-10px;background:linear-gradient(180deg,var(--gold-dim),transparent);border-radius:50%;}
+  .tier{width:180px;height:60px;margin:0 auto;border-radius:8px;background:linear-gradient(180deg,#3a2a1c,#2a1c12);position:relative;border:1px solid var(--gold-dim);}
+  .tier.top{width:130px;height:46px;margin-top:-6px;background:linear-gradient(180deg,#463222,#33231a);}
+  .frosting{position:absolute;top:-10px;left:0;right:0;height:16px;background:var(--cream);border-radius:50%/12px;opacity:.9;}
+  .candles{position:absolute;top:-46px;left:0;right:0;display:flex;justify-content:center;gap:16px;}
+  .candle{width:5px;height:34px;background:linear-gradient(180deg,var(--gold-light),var(--gold));border-radius:2px;position:relative;}
+  .flame{position:absolute;top:-16px;left:50%;transform:translateX(-50%);width:9px;height:14px;background:radial-gradient(circle at 50% 30%, #fff6d8, var(--rose) 60%, transparent 75%);border-radius:50% 50% 50% 50%/60% 60% 40% 40%;animation:flicker 1.4s ease-in-out infinite;transition:opacity .5s ease, transform .5s ease;}
+  .candle.out .flame{opacity:0;transform:translateX(-50%) scale(.2);}
+  @keyframes flicker{0%,100%{transform:translateX(-50%) scale(1);}50%{transform:translateX(-50%) scale(.85) rotate(3deg);}}
+
+  .balloon{position:absolute;width:46px;height:58px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;
+    animation:balloonFloat 5s ease-in-out infinite;}
+  .balloon::after{content:'';position:absolute;left:50%;bottom:-42px;width:1px;height:42px;background:var(--gold-dim);transform:translateX(-50%);}
+  .balloon.left{top:6%;left:8%;background:linear-gradient(160deg,var(--gold-light),var(--gold));animation-delay:.2s;}
+  .balloon.right{top:12%;right:9%;background:linear-gradient(160deg,var(--rose),#c9895c);animation-delay:1.1s;}
+  @keyframes balloonFloat{
+    0%,100%{transform:translateY(0) rotate(-3deg);}
+    50%{transform:translateY(-14px) rotate(3deg);}
+  }
+
+  .finale-sparkle{position:absolute;color:var(--gold-dim);animation:twinkle 3s ease-in-out infinite;pointer-events:none;}
+
+  .divider{display:flex;align-items:center;gap:.7rem;width:min(70vw,220px);margin:1.4rem auto 0;}
+  .divider .line{flex:1;height:1px;background:linear-gradient(90deg, transparent, var(--gold-dim));}
+  .divider .line.right{background:linear-gradient(90deg, var(--gold-dim), transparent);}
+  .divider .gem{width:6px;height:6px;background:var(--gold);transform:rotate(45deg);box-shadow:0 0 8px var(--gold-dim);}
+
+  #confetti-container{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:60;}
+  .confetti-piece{position:absolute;top:-10px;border-radius:1px;}
+
+  footer{padding:2.5rem 0 3rem;text-align:center;font-size:.75rem;opacity:.35;letter-spacing:.5px;}
+</style>
+</head>
+<body>
+
+<div class="aurora"></div>
+<canvas id="bg-stars"></canvas>
+<div id="hearts-bg"></div>
+
+<section class="hero">
+  <h1>Feliz cumpleaños, gomita</h1>
+  <div class="divider" style="margin:.4rem auto 1.4rem;"><span class="line"></span><span class="gem"></span><span class="line right"></span></div>
+  <p class="subtitle">Hoy el cielo tiene doce estrellas nuevas, mi amor — cada una guarda una razón por la que te amo. <strong>Encuéntralas todas.</strong></p>
+  <button class="primary" id="start-btn">Comenzar</button>
+  <p class="hint">un regalo de osito, para ti</p>
+  <div class="music-player">
+    <p class="music-caption">Dale play a "Die For You" mientras exploras</p>
+    <iframe style="border-radius:10px" src="https://open.spotify.com/embed/track/2LBqCSwhJGcFQeTHMVGwy3?utm_source=generator&theme=0" width="100%" height="80" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+  </div>
+  <p class="note">Sé que hoy no pude estar contigo, y es lo único que no me gusta de este día. Pero te prometo que muy pronto te voy a dar el mejor cumpleaños que hayas tenido — esto de aquí es solo el comienzo.</p>
+</section>
+
+<section class="constellation" id="constellation">
+  <p class="progress" id="progress-text">0 de 12 estrellas descubiertas</p>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+  <div class="sky-frame">
+    <svg class="lines" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <line pathLength="100" data-a="1" data-b="2" x1="50" y1="82" x2="30" y2="62"></line>
+      <line pathLength="100" data-a="2" data-b="3" x1="30" y1="62" x2="24" y2="50"></line>
+      <line pathLength="100" data-a="3" data-b="4" x1="24" y1="50" x2="18" y2="38"></line>
+      <line pathLength="100" data-a="4" data-b="5" x1="18" y1="38" x2="26.5" y2="29"></line>
+      <line pathLength="100" data-a="5" data-b="6" x1="26.5" y1="29" x2="35" y2="20"></line>
+      <line pathLength="100" data-a="6" data-b="7" x1="35" y1="20" x2="50" y2="30"></line>
+      <line pathLength="100" data-a="7" data-b="8" x1="50" y1="30" x2="65" y2="20"></line>
+      <line pathLength="100" data-a="8" data-b="9" x1="65" y1="20" x2="73.5" y2="29"></line>
+      <line pathLength="100" data-a="9" data-b="10" x1="73.5" y1="29" x2="82" y2="38"></line>
+      <line pathLength="100" data-a="10" data-b="11" x1="82" y1="38" x2="76" y2="50"></line>
+      <line pathLength="100" data-a="11" data-b="12" x1="76" y1="50" x2="70" y2="62"></line>
+      <line pathLength="100" data-a="12" data-b="1" x1="70" y1="62" x2="50" y2="82"></line>
+    </svg>
+
+    <button class="star" style="left:50%;top:82%" data-index="1" aria-label="Estrella 1">
+      <svg viewBox="0 0 24 24"><path class="spark" d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z"/></svg>
+    </button>
+    <button class="star" style="left:30%;top:62%" data-index="2" aria-label="Estrella 2">
+      <svg viewBox="0 0 24 24"><path class="spark" d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z"/></svg>
+    </button>
+    <button class="star" style="left:24%;top:50%" data-index="3" aria-label="Estrella 3">
+      <svg viewBox="0 0 24 24"><path class="spark" d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z"/></svg>
+    </button>
+    <button class="star" style="left:18%;top:38%" data-index="4" aria-label="Estrella 4">
+      <svg viewBox="0 0 24 24"><path class="spark" d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z"/></svg>
+    </button>
+    <button class="star" style="left:26.5%;top:29%" data-index="5" aria-label="Estrella 5">
+      <svg viewBox="0 0 24 24"><path class="spark" d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z"/></svg>
+    </button>
+    <button class="star" style="left:35%;top:20%" data-index="6" aria-label="Estrella 6">
+      <svg viewBox="0 0 24 24"><path class="spark" d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z"/></svg>
+    </button>
+    <button class="star" style="left:50%;top:30%" data-index="7" aria-label="Estrella 7">
+      <svg viewBox="0 0 24 24"><path class="spark" d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z"/></svg>
+    </button>
+    <button class="star" style="left:65%;top:20%" data-index="8" aria-label="Estrella 8">
+      <svg viewBox="0 0 24 24"><path class="spark" d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z"/></svg>
+    </button>
+    <button class="star" style="left:73.5%;top:29%" data-index="9" aria-label="Estrella 9">
+      <svg viewBox="0 0 24 24"><path class="spark" d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z"/></svg>
+    </button>
+    <button class="star" style="left:82%;top:38%" data-index="10" aria-label="Estrella 10">
+      <svg viewBox="0 0 24 24"><path class="spark" d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z"/></svg>
+    </button>
+    <button class="star" style="left:76%;top:50%" data-index="11" aria-label="Estrella 11">
+      <svg viewBox="0 0 24 24"><path class="spark" d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z"/></svg>
+    </button>
+    <button class="star" style="left:70%;top:62%" data-index="12" aria-label="Estrella 12">
+      <svg viewBox="0 0 24 24"><path class="spark" d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z"/></svg>
+    </button>
+  </div>
+  <div class="below" id="below-text"></div>
+</section>
+
+<section class="finale" id="finale">
+  <div class="balloon left"></div>
+  <div class="balloon right"></div>
+  <div class="balloon" style="top:2%;left:46%;width:34px;height:44px;background:linear-gradient(160deg,var(--cream),var(--gold-light));animation-delay:.7s;"></div>
+  <span class="finale-sparkle" style="top:8%;left:20%;font-size:14px;">&#10022;</span>
+  <span class="finale-sparkle" style="top:18%;right:22%;font-size:10px;animation-delay:.6s;">&#10022;</span>
+  <span class="finale-sparkle" style="top:38%;left:12%;font-size:12px;animation-delay:1.2s;">&#10022;</span>
+  <span class="finale-sparkle" style="top:45%;right:14%;font-size:16px;animation-delay:.3s;">&#10022;</span>
+  <span class="finale-sparkle" style="bottom:14%;left:16%;font-size:11px;animation-delay:.9s;">&#10022;</span>
+  <span class="finale-sparkle" style="bottom:10%;right:18%;font-size:13px;animation-delay:1.5s;">&#10022;</span>
+  <div class="cake reveal" id="cake">
+    <div class="cake-glow"></div>
+    <div class="orbit"><span>&#10084;</span><span>&#10022;</span><span>&#10084;</span><span>&#10022;</span></div>
+    <div class="candles" id="candles">
+      <div class="candle"><span class="flame"></span></div>
+      <div class="candle"><span class="flame"></span></div>
+      <div class="candle"><span class="flame"></span></div>
+      <div class="candle"><span class="flame"></span></div>
+      <div class="candle"><span class="flame"></span></div>
+    </div>
+    <div class="tier top"><div class="frosting"></div></div>
+    <div class="tier"><div class="frosting"></div></div>
+    <div class="plate"></div>
+  </div>
+  <button class="primary" id="blow-btn">Sopla las velas</button>
+  <h2 id="finale-title" style="opacity:0"></h2>
+  <p class="msg" id="finale-msg">Hoy el mundo tiene un año más de suerte por tenerte en él, mi amor. Gracias por cada risa compartida, cada plan improvisado y cada abrazo que hace que todo pese menos. Quiero acompañarte en muchos cumpleaños más, y en todos los días comunes de por medio. Te amo, Stacy.</p>
+  <div class="divider"><span class="line"></span><span class="gem"></span><span class="line right"></span></div>
+  <p class="signature" id="finale-sign" style="opacity:0">Con todo mi amor, tuyo siempre, osito</p>
+  <p class="ps" id="finale-ps" style="opacity:0">P.D. sigue tocando el pastel, le gusta.</p>
+  <button class="replay-btn" id="replay-btn">Volver a ver las estrellas</button>
+</section>
+
+<footer>hecho con cariño para Stacy</footer>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal-card">
+    <span class="mini-heart">&#10084;</span>
+    <p id="modal-text"></p>
+    <button id="modal-close">Cerrar</button>
+  </div>
+</div>
+
+<div id="confetti-container"></div>
+
+<script>
+  // ---------- Background starfield ----------
+  const canvas = document.getElementById('bg-stars');
+  const ctx = canvas.getContext('2d');
+  let W, H, stars = [];
+  function resize(){
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight * Math.max(3, document.body.scrollHeight / window.innerHeight);
+    stars = [];
+    const count = Math.floor((W*H)/9000);
+    for(let i=0;i<count;i++){
+      stars.push({
+        x: Math.random()*W, y: Math.random()*H,
+        r: Math.random()*1.3+0.3,
+        phase: Math.random()*Math.PI*2,
+        speed: 0.01 + Math.random()*0.02
+      });
+    }
+  }
+  let shooting = null;
+  function maybeSpawnShootingStar(){
+    if(!shooting && Math.random() < 0.004){
+      const startX = Math.random()*W*0.6 + W*0.1;
+      shooting = { x:startX, y: -10, vx: 4.5, vy: 3, life: 0 };
+    }
+  }
+  function draw(t){
+    ctx.clearRect(0,0,W,H);
+    for(const s of stars){
+      const alpha = 0.35 + 0.65*Math.abs(Math.sin(t*s.speed + s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(244,227,171,${alpha.toFixed(2)})`;
+      ctx.fill();
+    }
+    maybeSpawnShootingStar();
+    if(shooting){
+      ctx.save();
+      const grad = ctx.createLinearGradient(shooting.x, shooting.y, shooting.x - shooting.vx*8, shooting.y - shooting.vy*8);
+      grad.addColorStop(0, 'rgba(245,227,171,0.9)');
+      grad.addColorStop(1, 'rgba(245,227,171,0)');
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(shooting.x, shooting.y);
+      ctx.lineTo(shooting.x - shooting.vx*8, shooting.y - shooting.vy*8);
+      ctx.stroke();
+      ctx.restore();
+      shooting.x += shooting.vx;
+      shooting.y += shooting.vy;
+      shooting.life++;
+      if(shooting.y > H+20 || shooting.life > 200) shooting = null;
+    }
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+  requestAnimationFrame(draw);
+
+  // ---------- Cake heart burst on click ----------
+  document.getElementById('cake').addEventListener('click', (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    burstHearts(rect.left + rect.width/2, rect.top + rect.height/2);
+  });
+
+  // ---------- Scroll reveal ----------
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => { if(entry.isIntersecting) entry.target.classList.add('in-view'); });
+  }, { threshold: 0.3 });
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  // ---------- Falling gold dust ----------
+  function spawnDust(){
+    const d = document.createElement('div');
+    d.className = 'dust-mote';
+    const size = 2 + Math.random()*2.5;
+    d.style.width = d.style.height = size + 'px';
+    d.style.left = Math.random()*100 + 'vw';
+    d.style.opacity = 0;
+    const duration = 6 + Math.random()*6;
+    d.style.animationDuration = duration + 's';
+    d.style.setProperty('--dx', (Math.random()*60-30) + 'px');
+    document.body.appendChild(d);
+    setTimeout(() => d.remove(), duration*1000 + 200);
+  }
+  setInterval(spawnDust, 400);
+
+  // ---------- 3D tilt on modal card ----------
+  const modalCard = document.querySelector('.modal-card');
+  modalCard.addEventListener('mousemove', (e) => {
+    const rect = modalCard.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width - 0.5;
+    const py = (e.clientY - rect.top) / rect.height - 0.5;
+    modalCard.style.transform = `scale(1) rotateY(${px*8}deg) rotateX(${-py*8}deg)`;
+  });
+  modalCard.addEventListener('mouseleave', () => {
+    modalCard.style.transform = 'scale(1) rotateY(0) rotateX(0)';
+  });
+
+  // ---------- Button ripple ----------
+  document.querySelectorAll('button.primary').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const rect = btn.getBoundingClientRect();
+      const ripple = document.createElement('span');
+      ripple.className = 'ripple';
+      const size = Math.max(rect.width, rect.height);
+      ripple.style.width = ripple.style.height = size + 'px';
+      ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+      ripple.style.top = (e.clientY - rect.top - size/2) + 'px';
+      btn.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 650);
+    });
+  });
+
+  // ---------- Sky parallax on mouse move ----------
+  const skyFrame = document.querySelector('.sky-frame');
+  const heroH1 = document.querySelector('.hero h1');
+  window.addEventListener('mousemove', (e) => {
+    const nx = (e.clientX / window.innerWidth - 0.5);
+    const ny = (e.clientY / window.innerHeight - 0.5);
+    if(skyFrame) skyFrame.style.transform = `translate(${nx*10}px, ${ny*8}px)`;
+    if(heroH1) heroH1.style.transform = `translate(${nx*-6}px, ${ny*-4}px)`;
+  });
+
+  // ---------- Cursor sparkle trail (constellation zone only) ----------
+  let lastSpark = 0;
+  const constellationSection = document.getElementById('constellation');
+  constellationSection.addEventListener('mousemove', (e) => {
+    const now = Date.now();
+    if(now - lastSpark < 90) return;
+    lastSpark = now;
+    const spark = document.createElement('div');
+    spark.className = 'cursor-spark';
+    spark.style.left = e.clientX + 'px';
+    spark.style.top = e.clientY + 'px';
+    document.body.appendChild(spark);
+    setTimeout(() => spark.remove(), 720);
+  });
+
+  // ---------- Ambient floating hearts ----------
+  const heartsBg = document.getElementById('hearts-bg');
+  function spawnAmbientHeart(){
+    const heart = document.createElement('div');
+    heart.className = 'floating-heart';
+    heart.innerHTML = Math.random() > 0.5 ? '&#10084;' : '&#9825;';
+    const size = 10 + Math.random()*16;
+    heart.style.fontSize = size + 'px';
+    heart.style.left = Math.random()*100 + 'vw';
+    const duration = 9 + Math.random()*7;
+    heart.style.animationDuration = duration + 's';
+    heart.style.setProperty('--drift', (Math.random()*80-40) + 'px');
+    heartsBg.appendChild(heart);
+    setTimeout(() => heart.remove(), duration*1000 + 200);
+  }
+  setInterval(spawnAmbientHeart, 1800);
+  spawnAmbientHeart();
+
+  // ---------- Heart burst on star open ----------
+  function burstHearts(x, y){
+    const count = 8;
+    for(let i=0;i<count;i++){
+      const h = document.createElement('div');
+      h.className = 'heart-burst';
+      h.innerHTML = '&#10084;';
+      h.style.left = x + 'px';
+      h.style.top = y + 'px';
+      h.style.fontSize = (10 + Math.random()*8) + 'px';
+      document.body.appendChild(h);
+      const angle = (Math.PI*2*i)/count + Math.random()*0.4;
+      const dist = 40 + Math.random()*30;
+      const dx = Math.cos(angle)*dist, dy = Math.sin(angle)*dist;
+      h.animate([
+        { transform: 'translate(-50%,-50%) translate(0,0) scale(.4)', opacity: 1 },
+        { transform: `translate(-50%,-50%) translate(${dx}px, ${dy}px) scale(1)`, opacity: 0 }
+      ], { duration: 900, easing: 'ease-out', fill:'forwards' });
+      setTimeout(() => h.remove(), 950);
+    }
+  }
+
+  // ---------- Scroll to constellation ----------
+  document.getElementById('start-btn').addEventListener('click', () => {
+    document.getElementById('constellation').scrollIntoView({behavior:'smooth'});
+  });
+
+  // ---------- Messages ----------
+  const messages = {
+    1: "Desde que te até a mi vida, hasta las noches más difíciles se sienten más livianas porque sé que te tengo a mi lado.",
+    2: "Me enamoro un poco más cada vez que te ríes de tus propios chistes antes de terminar de contarlos.",
+    3: "Eres mi persona favorita para todo: para los planes grandes, para no hacer nada, para crecer juntos.",
+    4: "Contigo entendí que el amor de verdad se construye en lo pequeño: un café compartido, un 'te extraño' a media tarde, un abrazo que llega justo cuando lo necesito.",
+    5: "Amo cómo cuidas a todos los que quieres, y quiero pasar la vida cuidándote a ti también, todos los días que me dejes.",
+    6: "No importa el plan: contigo siempre es el lugar donde quiero estar. Eres mi hogar favorito.",
+    7: "Gracias por elegirme cada día, Stacy. Elegirte a ti es lo más fácil que he hecho en mi vida.",
+    8: "Cada vez que discutimos y luego hacemos las paces, confirmo que no hay nadie más con quien prefiera reconciliarme.",
+    9: "Me encanta cómo te ves cuando te concentras en algo que te importa; ahí es cuando más te admiro.",
+    10: "Quiero seguir aprendiendo de ti, riendo contigo y construyendo una vida a tu lado, un día a la vez.",
+    11: "Aunque hoy no pude estar a tu lado, mi cabeza y mi corazón no se han movido de donde estás tú.",
+    12: "Hoy el mundo tiene un año más de suerte por tenerte, y yo tengo una razón más para amarte. Feliz cumpleaños, mi amor. Feliz cumpleaños, gomita."
+  };
+
+  const openedSet = new Set();
+  const modal = document.getElementById('modal');
+  const modalText = document.getElementById('modal-text');
+  const progressText = document.getElementById('progress-text');
+  const belowText = document.getElementById('below-text');
+
+  function openModal(index){
+    modalText.textContent = messages[index];
+    modal.classList.add('show');
+    modal.dataset.current = index;
+  }
+  function closeModal(){
+    modal.classList.remove('show');
+    const idx = modal.dataset.current;
+    if(idx && !openedSet.has(idx)){
+      openedSet.add(idx);
+      document.querySelector(`.star[data-index="${idx}"]`).classList.add('opened');
+      updateLines();
+      progressText.textContent = `${openedSet.size} de 12 estrellas descubiertas`;
+      document.getElementById('progress-fill').style.width = (openedSet.size/12*100) + '%';
+      if(openedSet.size === 12){
+        belowText.textContent = 'Todas las estrellas están unidas. Sigue bajando.';
+        setTimeout(() => {
+          const finale = document.getElementById('finale');
+          finale.classList.add('show');
+          finale.scrollIntoView({behavior:'smooth'});
+        }, 900);
+      }
+    }
+  }
+  document.querySelectorAll('.star').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const rect = btn.getBoundingClientRect();
+      burstHearts(rect.left + rect.width/2, rect.top + rect.height/2);
+      openModal(btn.dataset.index);
+    });
+  });
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => { if(e.target === modal) closeModal(); });
+
+  function updateLines(){
+    document.querySelectorAll('svg.lines line').forEach(line => {
+      const a = line.dataset.a, b = line.dataset.b;
+      if(openedSet.has(a) && openedSet.has(b)){
+        line.classList.add('active');
+      }
+    });
+  }
+
+  // ---------- Finale: blow candles ----------
+  const blowBtn = document.getElementById('blow-btn');
+  blowBtn.addEventListener('click', () => {
+    blowBtn.classList.add('hidden');
+    const candles = document.querySelectorAll('.candle');
+    candles.forEach((c, i) => {
+      setTimeout(() => c.classList.add('out'), i*250);
+    });
+    setTimeout(() => {
+      launchConfetti();
+      const title = document.getElementById('finale-title');
+      const msg = document.getElementById('finale-msg');
+      const sign = document.getElementById('finale-sign');
+      title.textContent = '¡Feliz cumpleaños, mi amor!';
+      title.style.transition = 'opacity 1s ease';
+      title.style.opacity = 1;
+      title.classList.add('beat');
+      msg.classList.add('show');
+      setTimeout(() => { sign.style.transition = 'opacity 1s ease'; sign.style.opacity = 1; }, 500);
+      setTimeout(() => {
+        document.getElementById('finale-ps').style.opacity = 1;
+        document.getElementById('replay-btn').style.opacity = 1;
+      }, 1300);
+    }, candles.length*250 + 400);
+  });
+
+  // ---------- Tocar el pastel: mini ráfaga de corazones ----------
+  document.getElementById('cake').addEventListener('click', (e) => {
+    burstHearts(e.clientX, e.clientY);
+  });
+
+  // ---------- Volver a ver las estrellas ----------
+  document.getElementById('replay-btn').addEventListener('click', () => {
+    document.getElementById('constellation').scrollIntoView({behavior:'smooth'});
+  });
+
+  function launchConfetti(){
+    const colors = ['#d4af37', '#f5e3ab', '#f4efe1', '#e7a978'];
+    const container = document.getElementById('confetti-container');
+    for(let i=0;i<110;i++){
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      const size = 5 + Math.random()*6;
+      piece.style.width = size+'px';
+      piece.style.height = (size*0.4)+'px';
+      piece.style.left = Math.random()*100+'vw';
+      piece.style.background = colors[Math.floor(Math.random()*colors.length)];
+      const duration = 3 + Math.random()*2.5;
+      const delay = Math.random()*0.6;
+      const rotate = Math.random()*360;
+      piece.style.transform = `rotate(${rotate}deg)`;
+      piece.animate([
+        { transform: `translateY(0) rotate(${rotate}deg)`, opacity: 1 },
+        { transform: `translateY(${window.innerHeight+40}px) rotate(${rotate+360}deg)`, opacity: 0.9 }
+      ], { duration: duration*1000, delay: delay*1000, easing: 'cubic-bezier(.25,.46,.45,.94)', fill:'forwards' });
+      container.appendChild(piece);
+      setTimeout(() => piece.remove(), (duration+delay)*1000 + 200);
+    }
+    // corazones cayendo junto al confeti
+    for(let i=0;i<40;i++){
+      const heart = document.createElement('div');
+      heart.className = 'confetti-piece';
+      heart.innerHTML = '&#10084;';
+      heart.style.background = 'none';
+      heart.style.color = colors[Math.floor(Math.random()*colors.length)];
+      heart.style.fontSize = (10 + Math.random()*10)+'px';
+      heart.style.left = Math.random()*100+'vw';
+      const duration = 3.5 + Math.random()*3;
+      const delay = Math.random()*0.8;
+      const rotate = Math.random()*60-30;
+      heart.animate([
+        { transform: `translateY(0) rotate(${rotate}deg)`, opacity: 1 },
+        { transform: `translateY(${window.innerHeight+40}px) rotate(${rotate+40}deg)`, opacity: 0.85 }
+      ], { duration: duration*1000, delay: delay*1000, easing: 'cubic-bezier(.25,.46,.45,.94)', fill:'forwards' });
+      container.appendChild(heart);
+      setTimeout(() => heart.remove(), (duration+delay)*1000 + 200);
+    }
+  }
+</script>
+</body>
+</html>
